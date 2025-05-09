@@ -1,0 +1,42 @@
+# Case 1 :  HTTP Request Trigger ( Premium )
+
+Parent Flow Setup
+1. Create or open a parent flow.
+2. Use "HTTP" action.
+Method: POST
+URI: paste the URL from the child flow
+Headers: Content-Type: application/json
+Body: JSON with parameters.
+3. Use the output from the child flow (from HTTP response) in later steps.
+
+Child Flow Setup
+1. Create a new flow.
+2. Use "When an HTTP request is received" trigger.
+3. Define the request body schema (optional).
+4. Add desired actions (logic, return data, etc.).
+5. Use the "Response" action at the end to send output.
+6. Save the flow — you’ll get a POST URL.
+
+
+
+# Case 2. Run a Child Flow (Solution-Aware Flows)
+
+Parent Flow Setup
+1. Inside the same solution, create a new parent flow.
+2. Add the "Run a Child Flow" action.
+3. Select the child flow.
+4. Provide necessary input parameters.
+5. Use the output from the child flow as needed.
+
+Child Flow Setup
+1. Create a new solution (if not already created).
+2. Inside the solution, create a new flow.
+3. Use "Manually trigger a flow" as the trigger.
+4. Define input parameters (optional).
+5. Add your logic.
+6. End with "Respond to a PowerApp or flow" action to send outputs.
+
+Note: This doesn’t need premium, but must be inside a solution.
+
+
+Case 3: using 
