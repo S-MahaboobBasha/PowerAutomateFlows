@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="PowerAutomateFlows/image.png" alt="Alt Text" width="400"/>
+  <img src="images/image.png" alt="Alt Text" width="400"/>
 </p>
 
 <p align="center">
