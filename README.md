@@ -1,6 +1,6 @@
 # PowerAutomateFlows
-  Step1: Manually trigger flow
-  Step2: Lit rows (Dataverse action i.e., Retrieve all rows)
+Step1: Manually trigger flow
+Step2: Lit rows (Dataverse action i.e., Retrieve all rows)
 Step3: Select Action ( to fetch only specific columns)
 Step4: Get file content (i.e., provide the Excel template which you create nothing but Blank Excel)
 Step5: Create file (this will fetch style or template to create)
