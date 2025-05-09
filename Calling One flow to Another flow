@@ -39,4 +39,15 @@ Child Flow Setup
 Note: This doesn’t need premium, but must be inside a solution.
 
 
-Case 3: using 
+Case 3: Using PowerApps Onselect of button
+
+Set(result1, Flow1.Run(param1));
+If(
+    result1.Status = "Success",
+    Set(result2, Flow2.Run(param2))
+)
+
+
+Set ( Flow1 , Flow1.run());
+Set ( Flow2 , Flow2.run());
+
