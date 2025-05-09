@@ -1,8 +1,3 @@
-<p align="center">
-  <img src="images/image.png" alt="Alt Text" width="400"/>
-</p>
+![Description of Image](image.png)
 
-<p align="center">
-  This is the content written below the image.
-</p>
-
+This is a screenshot showing the main dashboard of the application. It highlights the key performance metrics and user interface layout.
