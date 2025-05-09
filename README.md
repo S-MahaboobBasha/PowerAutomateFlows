@@ -18,6 +18,3 @@ Provide the item properties
   "Column2": "Value2",
   "Column3": "Value3"
 }
-
-
-
