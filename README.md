@@ -1,3 +1,3 @@
-(image.png)
+![Description of Image](image.png)
 
-This is a screenshot showing the main dashboard of the application. It highlights the key performance metrics and user interface layout.
+How to Resolve HTTP 504 Gateway Timeout Error Due to Workflow Execution Timeout
