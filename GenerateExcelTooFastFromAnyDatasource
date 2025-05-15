@@ -1,0 +1,36 @@
+Step1: Manually tirgger a flow
+
+Step2: Create file (Onedrive Action)
+Folder Path : /Data_Export/
+File Name : StudentDate_utcNow().xlsx
+File Content : Use Space (By using Keyboard)
+
+Step3: Create table
+Location : Onedrive for Business
+Document Library : Onedrive
+File : outputs('Create_file')?['body/Id']----> Use Dynamic content under create file section to can id select that
+Table Name : StudentTable
+Columns names : Name,Address,Pincode,PhoneNumber,AlternateNumber,State
+
+Step4: List rows (Dataverse Action) / Get Items (SharePoint Action)
+
+Step5: Select 
+ From : value
+ Map: [
+        item()?['Name'],
+        item()?['Address'],
+        item()?['Pincode'],
+        item()?['PhoneNumber'],  
+        null, // to Insert blank value for entire columns or else COALESCE(item()?['PhoneNumber'], null)
+        item()?['Name']
+      ]
+
+Step6: Send an HTTP request
+URI : https://graph.microsoft.com/v1.0/me/drive/items/{drive-Id}/workbook/tables/{Tablename}/rows
+{drive-Id} replace with Expression i.e., split(actions('Create_table')?['inputs']?['parameters']?['file'],'.')?[1]
+{Tablename} i.e., in this example StudentTable
+Method : POST
+Body : {
+        "values": body('Select')
+       }
+Content-Type : application/json
