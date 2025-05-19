@@ -15,6 +15,49 @@ and ( equals(actions(<action_name>)?['status'], 'Succeeded'),
 Hi Team,
 Flow Failed!
 
+Body content in Email to get know which action is failed and Error message
+
+concat(
+  if(
+    or(
+      equals(actions('Dataverse_Action_1')?['status'], 'Failed'),
+      equals(actions('Dataverse_Action_1')?['status'], 'Skipped'),
+      equals(actions('Dataverse_Action_1')?['status'], 'TimedOut')
+    ),
+    concat('Dataverse Action 1: ', actions('Dataverse_Action_1')?['error']?['message'], '<br>'),
+    ''
+  ),
+  if(
+    or(
+      equals(actions('Dataverse_Action_2')?['status'], 'Failed'),
+      equals(actions('Dataverse_Action_2')?['status'], 'Skipped'),
+      equals(actions('Dataverse_Action_2')?['status'], 'TimedOut')
+    ),
+    concat('Dataverse Action 2: ', actions('Dataverse_Action_2')?['error']?['message'], '<br>'),
+    ''
+  ),
+  if(
+    or(
+      equals(actions('Dataverse_Action_3')?['status'], 'Failed'),
+      equals(actions('Dataverse_Action_3')?['status'], 'Skipped'),
+      equals(actions('Dataverse_Action_3')?['status'], 'TimedOut')
+    ),
+    concat('Dataverse Action 3: ', actions('Dataverse_Action_3')?['error']?['message'], '<br>'),
+    ''
+  ),
+  if(
+    or(
+      equals(actions('Dataverse_Action_4')?['status'], 'Failed'),
+      equals(actions('Dataverse_Action_4')?['status'], 'Skipped'),
+      equals(actions('Dataverse_Action_4')?['status'], 'TimedOut')
+    ),
+    concat('Dataverse Action 4: ', actions('Dataverse_Action_4')?['error']?['message'], '<br>'),
+    ''
+  )
+)
+
+
+
 # Expression : 
 
 # workflow()['tags']['environmentName']
