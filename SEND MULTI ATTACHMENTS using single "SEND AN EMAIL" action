@@ -1,0 +1,196 @@
+SEND MULTI ATTACHMENTS using single "SEND AN EMAIL" action 
+
+1. Manual Trigger or Power Apps Trigger
+
+If Manual Trigger 
+
+Choose the type of User input by adding input
+
+Input Name - Object 
+
+Provide below object as input
+
+{
+  "fiveWeeksFromDate": "2025-10-02",
+  "fiveWeeksToDate": "2025-11-05",
+  "fourToFiveWeeksFromDate": "2025-10-23",
+  "fourToFiveWeeksToDate": "2025-11-05",
+  "presetFiveFromDate": "2025-11-06",
+  "presetFiveToDate": "2025-12-31",
+  "presetFourFromDate": "2025-04-01",
+  "presetFourToDate": "2025-04-30",
+  "presetOneFromDate": "2025-09-01",
+  "presetOneToDate": "2025-09-30",
+  "presetSixFromDate": null,
+  "presetSixToDate": null,
+  "presetThreeFromDate": "2025-08-01",
+  "presetThreeToDate": "2025-08-31",
+  "presetTwoFromDate": "2025-07-01",
+  "presetTwoToDate": "2025-08-01",
+  "threeWeeksFromDate": "2025-10-02",
+  "threeWeeksToDate": "2025-10-22"
+}
+
+2. Take Parse Json action
+
+Content : Previous Output ( Trigger Output )
+Schema : Click on Generate from sample 
+
+Paste Below Json Object
+
+{
+  "fiveWeeksFromDate": "2025-10-02",
+  "fiveWeeksToDate": "2025-11-05",
+  "fourToFiveWeeksFromDate": "2025-10-23",
+  "fourToFiveWeeksToDate": "2025-11-05",
+  "presetFiveFromDate": "2025-11-06",
+  "presetFiveToDate": "2025-12-31",
+  "presetFourFromDate": "2025-04-01",
+  "presetFourToDate": "2025-04-30",
+  "presetOneFromDate": "2025-09-01",
+  "presetOneToDate": "2025-09-30",
+  "presetSixFromDate": null,
+  "presetSixToDate": null,
+  "presetThreeFromDate": "2025-08-01",
+  "presetThreeToDate": "2025-08-31",
+  "presetTwoFromDate": "2025-07-01",
+  "presetTwoToDate": "2025-08-01",
+  "threeWeeksFromDate": "2025-10-02",
+  "threeWeeksToDate": "2025-10-22"
+}
+
+Click ok/generate
+
+
+3. Take 10 action using Parallel branches 
+
+_________________________________________________________________________________________________________________________________________________	
+|		|		|		|		|		|		|		|		|		|
+|		|		|		|		|		|		|		|		|		|
+OneWeeks     TwoWeeks	     ThreeWeeks     PresetOne	     PresetTwo	    PresetThree	     PresetFour	     PresetFive	    PresetSix	     Default
+
+
+Imporant :
+
+Including all Preset 
+Take Condition Action
+
+Condition:  not(empty(parameters('Param1'))) is equal to  true 
+
+Yes Branch
+
+Take List rows Action
+
+Table Name : <Datasource>
+Select columns :
+Filter rows : StartDate ge formatDateTime(body('Parse_JSON')?['FromDate'],'MM/dd/yyyy') and EndDate ge formatDateTime(body('Parse_JSON')?['ToDate'],'MM/dd/yyyy')
+Sort By :
+Fetch Xml Query :
+Row Count : 
+
+Take Create CSV Table Action
+
+From : outputs(List rows)
+Select Custom from dropdown
+Header (Column Name)    |   Value (item()?['Name']) -mapping column value
+
+No Branch - Leave empty
+
+
+Under each Branches for Excluding Preset and Default
+
+4. Take List rows Action
+
+Table Name : <Datasource>
+Select columns :
+Filter rows : StartDate ge formatDateTime(body('Parse_JSON')?['FromDate'],'MM/dd/yyyy') and EndDate ge formatDateTime(body('Parse_JSON')?['ToDate'],'MM/dd/yyyy')
+Sort By :
+Fetch Xml Query :
+Row Count : 
+
+5. Take Create CSV Table Action
+
+From : outputs(List rows)
+Select Custom from dropdown
+Header (Column Name)    |   Value (item()?['Name']) -mapping column value
+
+6. Initialize variable
+
+Name : varAllAttachment
+Type : Array
+Value: 
+
+[
+  {
+    "hasData": not(empty(parameters('Param1'))),
+    "name": "File1.csv", 
+    "content": body('Create_CSV_1')
+  },
+  {
+    "hasData": not(empty(parameters('Param2'))),
+    "name": "File2.csv",
+    "content": body('Create_CSV_2')
+  },
+  {
+    "hasData": not(empty(parameters('Param3'))),
+    "name": "File3.csv",
+    "content": body('Create_CSV_3')
+  },
+  {
+    "hasData": not(empty(parameters('Param4'))),
+    "name": "File4.csv",
+    "content": body('Create_CSV_4')
+  },
+  {
+    "hasData": not(empty(parameters('Param5'))),
+    "name": "File5.csv",
+    "content": body('Create_CSV_5')
+  },
+  {
+    "hasData": not(empty(parameters('Param6'))),
+    "name": "File6.csv",
+    "content": body('Create_CSV_6')
+  },
+  {
+    "hasData": not(empty(parameters('Param7'))),
+    "name": "File7.csv",
+    "content": body('Create_CSV_7')
+  },
+  {
+    "hasData": not(empty(parameters('Param8'))),
+    "name": "File8.csv",
+    "content": body('Create_CSV_8')
+  },
+  {
+    "hasData": not(empty(parameters('Param9'))),
+    "name": "File9.csv",
+    "content": body('Create_CSV_9')
+  },
+  {
+    "hasData": not(empty(parameters('Param10'))),
+    "name": "File10.csv",
+    "content": body('Create_CSV_10')
+  }
+]
+
+7. Take Filter Array Action
+
+From : variables('varAllAttachment') using expression / choose from dynamic content
+Condition:  item()?['hasDate'] is equal to true
+
+8. Take Select Action
+
+From : body('Filter_Array')
+ Map : 
+
+Key       	Value
+Name      	item()?['name']
+ContentBytes	item()?['content']
+
+
+9. Take Send an email Action
+
+TO:
+Subject:
+Body:
+Attachment: body('Select')
