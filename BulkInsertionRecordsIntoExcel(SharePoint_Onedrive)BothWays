@@ -1,0 +1,310 @@
+
+---------------------OneDrive Method------------------------------------
+
+
+{
+    "5WeeksFromDate": "2025-10-02",
+    "5WeeksToDate": "2025-10-02",
+    
+    "4WeeksFromDate": "2025-10-02",
+    "4WeeksToDate": "2025-10-02",
+
+    "3WeeksFromDate": "2025-10-02",
+    "3WeeksToDate": "2025-10-02",
+
+    "2WeeksFromDate": "2025-10-02",
+    "2WeeksToDate": "2025-10-02",
+    
+    "1WeeksFromDate": "2025-10-02",
+    "1WeeksToDate": "2025-10-02"
+}
+
+2. Action ------> Parse JSON 
+
+Content: Input of manual trigger Object
+Schema: {
+    "5WeeksFromDate": "2025-10-02",
+    "5WeeksToDate": "2025-10-02",
+    
+    "4WeeksFromDate": "2025-10-02",
+    "4WeeksToDate": "2025-10-02",
+
+    "3WeeksFromDate": "2025-10-02",
+    "3WeeksToDate": "2025-10-02",
+
+    "2WeeksFromDate": "2025-10-02",
+    "2WeeksToDate": "2025-10-02",
+    
+    "1WeeksFromDate": "2025-10-02",
+    "1WeeksToDate": "2025-10-02"
+}
+
+
+3. Action ------> Create file
+
+Folder Path: /Foldername/
+File Name: FileName_formatDateTime(utcNow(), 'MM/dd/yyyy hh:mm:ss tt').xlsx  { Expression: formatDateTime(utcNow(), 'MM/dd/yyyy hh:mm:ss tt') }
+File Content: {Enter Space}
+
+
+
+4. Action ------> Compose 
+
+Inputs:  { Expression: split(outputs('Create_file')?['body/Id'],'.')[1]  }
+
+5. Action ------> Create worksheet
+
+Location: OneDrive for Business
+Document Library: OneDrive
+File: outputs('Create_file')?['body/Id'] {Dynamic Content}
+Name: 3 Weeks Data
+
+6. Action ------> Create table
+
+Location: OneDrive for Business
+Document Library: OneDrive
+File: outputs('Create_file')?['body/Id'] {Dynamic Content}
+Table range: 'outputs('Create_worksheet')?['body/name'] '!$A1:$K1       [outputs('Create_worksheet')?['body/name']  {Dynamic Content} ] 
+Table name : ThreeWeeksData
+Columns names:  ColumnName1,ColumnName2,ColumnName3,ColumnName4,ColumnName5,
+                ColumnName6,ColumnName7,ColumnName8,ColumnName9,ColumnName10
+
+
+7. Action ------------> List rows (Dataverse Action) 
+
+Expression 1= 'formatDateTime(body('Parse_JSON')?['5WeeksFromDate'], 'MM/dd/yyyy')'
+Expression 2= 'formatDateTime(body('Parse_JSON')?['5WeeksFromDate'], 'MM/dd/yyyy')'
+
+
+Turn on Pagination *Important
+
+Table name:  <Dataverse table name>
+Select columns: 
+Filter rows: LogiccolumnnameofDataverse ge 'formatDateTime(body('Parse_JSON')?['5WeeksFromDate'], 'MM/dd/yyyy')' and LogiccolumnnameofDataverse le ''formatDateTime(body('Parse_JSON')?['5WeeksToDate'], 'MM/dd/yyyy')'' and LogiccolumnnameofDataverse eq 'Approved'
+Sort By:
+Fetch Xml Query:
+Row count:
+Return Full Metadata:
+Expand Query:
+Skip token:
+Partition ID:
+
+
+8. Action ---------->  Select 
+
+From:  outputs('List_rows')?['body/value']
+Map: 
+
+[
+    Columnvalue1 {Dynamic Content}
+    Columnvalue2 {Dynamic Content}
+    Columnvalue3 {Dynamic Content}
+    Columnvalue4 {Dynamic Content}
+    Columnvalue5 {Dynamic Content}
+    Columnvalue6 {Dynamic Content}
+    Columnvalue7 {Dynamic Content}
+    Columnvalue8 {Dynamic Content}
+    Columnvalue9 {Dynamic Content}
+    Columnvalue10 {Dynamic Content}
+]
+
+9. Action -------> Compose1
+
+Inputs: split(action('Create_table')?['inputs']?['parameters']?['file'],'.')?[1]
+
+10. Action  -------> send an HTTP request  
+
+{outputs('Compose') = split(outputs('Create_file')?['body/Id'],'.')[1]}
+or Else
+{outputs('Compose1') = split(action('Create_table')?['inputs']?['parameters']?['file'],'.')?[1]}
+
+/* https://graph.microsoft.com/v1.0/me/drive/items/{itemid}/workbook/worksheets{Sheetname}/tables/{Tablename}/rows      */
+
+URI:  https://graph.microsoft.com/v1.0/me/drive/items/outputs('Compose')/workbook/worksheets('3 Weeks Data')/tables/ThreeWeeksData/rows
+Method: POST
+Body: 
+{
+    "values": body('Select')
+}
+
+Content-Type: application/json
+
+11. Action  -------> send an HTTP request  
+
+/* To Delete Default Sheet in Excel */
+
+/* https://graph.microsoft.com/v1.0/me/drive/items/{itemId}/workbook/worksheets/{SheetName}
+
+{outputs('Compose') = split(outputs('Create_file')?['body/Id'],'.')[1]}
+
+URI:  https://graph.microsoft.com/v1.0/me/drive/items/outputs('Compose')/workbook/worksheets/Sheet1
+Method: DELETE
+Body: 
+{
+    "values": body('Select')
+}
+
+Content-Type: application/json
+
+
+12. Action ----> Delay
+Count: 1
+Unit: Minute
+
+13. Action -----> Get file Content
+
+File :outputs('Create_file')?['body/Id'] {Dynamic Content}
+
+
+14. Action -----> Create share link
+
+File:  outputs('Create_file')?['body/Id']   {Dynamic Content}
+Link Type: View
+Link Scope: Organization
+
+15. Action ------> Send an email(V2)
+
+To: <mailId>
+Subject: Export Excel
+Body: To View :  outputs('Create_share_link')?['body/WebUrl'] {Dynamic Content}
+Attachment Name-1: outputs('Create_file')?['body/Name'] {Dynamic Content}
+Attachment Content: body('Get_file_Content')
+
+
+
+
+---------------------SharePoint Method------------------------------------
+
+{
+    "5WeeksFromDate": "2025-10-02",
+    "5WeeksToDate": "2025-10-02",
+    
+    "4WeeksFromDate": "2025-10-02",
+    "4WeeksToDate": "2025-10-02",
+
+    "3WeeksFromDate": "2025-10-02",
+    "3WeeksToDate": "2025-10-02",
+
+    "2WeeksFromDate": "2025-10-02",
+    "2WeeksToDate": "2025-10-02",
+    
+    "1WeeksFromDate": "2025-10-02",
+    "1WeeksToDate": "2025-10-02"
+}
+
+2. Action ------> Parse JSON 
+
+Content: Input of manual trigger Object
+Schema: {
+    "5WeeksFromDate": "2025-10-02",
+    "5WeeksToDate": "2025-10-02",
+    
+    "4WeeksFromDate": "2025-10-02",
+    "4WeeksToDate": "2025-10-02",
+
+    "3WeeksFromDate": "2025-10-02",
+    "3WeeksToDate": "2025-10-02",
+
+    "2WeeksFromDate": "2025-10-02",
+    "2WeeksToDate": "2025-10-02",
+    
+    "1WeeksFromDate": "2025-10-02",
+    "1WeeksToDate": "2025-10-02"
+}
+
+3. Action ---------> Create new folder 
+
+Site Address: Siteurl ---> Select from dropdown
+List or Library: Documents --> Select from dropdown
+Folder Path: FolderName {Eg., InsuranceData}
+
+
+4. Action -----------> Create file
+
+
+Site Address: Siteurl ---> Select from dropdown
+Folder Path: outputs('Create_new_folder')?['body/{FullPath}'] {Dynamic Content}
+File Name: FileName_formatDateTime(utcNow(), 'MM/dd/yyyy hh:mm:ss tt').xlsx  { Expression: formatDateTime(utcNow(), 'MM/dd/yyyy hh:mm:ss tt') }
+File Content: {Enter Space}
+
+5. Action ------> Create worksheet
+
+Location: OneDrive for Business
+Document Library: OneDrive
+File: outputs('Create_file')?['body/Id'] {Dynamic Content}
+Name: FourWeeksDataSheet
+
+6. Action ------> Create table
+
+Location: OneDrive for Business
+Document Library: OneDrive
+File: outputs('Create_file')?['body/Id'] {Dynamic Content}
+Table range: 'outputs('Create_worksheet')?['body/name'] '!$A1:$K1       [outputs('Create_worksheet')?['body/name']  {Dynamic Content} ] 
+Table name : FourWeeksData
+Columns names:  ColumnName1,ColumnName2,ColumnName3,ColumnName4,ColumnName5,
+                ColumnName6,ColumnName7,ColumnName8,ColumnName9,ColumnName10
+
+
+7. Action ------------> List rows (Dataverse Action) 
+
+Expression 1= 'formatDateTime(body('Parse_JSON')?['5WeeksFromDate'], 'MM/dd/yyyy')'
+Expression 2= 'formatDateTime(body('Parse_JSON')?['5WeeksFromDate'], 'MM/dd/yyyy')'
+
+
+Turn on Pagination *Important
+
+Table name:  <Dataverse table name>
+Select columns: 
+Filter rows: LogiccolumnnameofDataverse ge 'formatDateTime(body('Parse_JSON')?['5WeeksFromDate'], 'MM/dd/yyyy')' and LogiccolumnnameofDataverse le ''formatDateTime(body('Parse_JSON')?['5WeeksToDate'], 'MM/dd/yyyy')'' and LogiccolumnnameofDataverse eq 'Approved'
+Sort By:
+Fetch Xml Query:
+Row count:
+Return Full Metadata:
+Expand Query:
+Skip token:
+Partition ID:
+
+
+8. Action ---------->  Select 
+
+From:  outputs('List_rows')?['body/value']
+Map: 
+
+[
+    Columnvalue1 {Dynamic Content}
+    Columnvalue2 {Dynamic Content}
+    Columnvalue3 {Dynamic Content}
+    Columnvalue4 {Dynamic Content}
+    Columnvalue5 {Dynamic Content}
+    Columnvalue6 {Dynamic Content}
+    Columnvalue7 {Dynamic Content}
+    Columnvalue8 {Dynamic Content}
+    Columnvalue9 {Dynamic Content}
+    Columnvalue10 {Dynamic Content}
+]
+
+9. Action -------> Compose 
+
+/* Compose action to fetch DriveId */
+Inputs: actions('Create_table')?['inputs']?['parameters']?['drive']
+
+
+10. Action -------> Compose 1
+
+/* Compose 1 action to fetch ItemId */
+Inputs: split(split(outputs('item'),'item(''')[1],''')')[0]
+
+11. Action  -------> send an HTTP request  
+
+URI: https://graph.microsoft.com/v1.0/me/drives/{driveId}/items/{ItemId}/workbook/worksheets/{workbooksheetname}/tables/{tablename}/rows/
+
+URI: https://graph.microsoft.com/v1.0/me/drives/outputs('Compose')/items/outputs('Compose 1')/workbook/worksheets/FourWeeksDataSheet/tables/FourWeeksData/rows/
+Method: POST
+Body: 
+{
+    "values": body('Select')
+}
+
+Content-Type: application/json
+
+
